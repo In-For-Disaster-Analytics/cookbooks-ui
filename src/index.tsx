@@ -7,7 +7,7 @@ import 'tapis-ui/index.css';
 import { resolveBasePath } from 'utils/resloveBasePath';
 import reportWebVitals from './reportWebVitals';
 import UpstreamProvider from 'upstream-hooks/provider/UpstreamProvider';
-const upstreamBasePath = 'https://upstream-dso.tacc.utexas.edu';
+const upstreamBasePath = 'https://upstream-dso.tacc.utexas.edu/api/v1';
 
 ReactDOM.render(
   <React.StrictMode>
