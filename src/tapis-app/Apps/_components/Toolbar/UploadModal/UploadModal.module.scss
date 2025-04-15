@@ -59,3 +59,165 @@
   border: 1px solid #dddddd;
   border-radius: 5px;
 }
+
+/* New Modal Styles */
+.uploadModalBody {
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+}
+
+.summary {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  color: #495057;
+}
+
+.formSection {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9ecef;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.stepBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  margin-right: 0.75rem;
+}
+
+.stepTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.optionsContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Add responsive styles for smaller screens */
+@media (max-width: 768px) {
+  .optionsContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .orCircle {
+    margin: 1rem 0;
+  }
+}
+
+.optionCard {
+  flex: 1;
+  padding: 1.25rem;
+  border: 2px solid #dee2e6;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  background-color: #f8f9fa;
+}
+
+.selectedOption {
+  border-color: #007bff;
+  background-color: #f0f7ff;
+  box-shadow: 0 0 0 1px rgba(0, 123, 255, 0.25);
+}
+
+.optionHeader {
+  margin-bottom: 1rem;
+}
+
+.optionTitle {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #495057;
+}
+
+.orCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: white;
+  color: #6c757d;
+  font-weight: 600;
+  border: 2px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+.divider {
+  height: 1px;
+  background-color: #dee2e6;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.idFormContainer {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  border: 1px dashed #ced4da;
+}
+
+.submitContainer {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.submit {
+  font-weight: 600 !important;
+  padding: 0.75rem !important;
+  font-size: 1.1rem !important;
+  width: 100%;
+  max-width: 350px;
+}
+
+.input {
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.input:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #495057;
+}
+
+.helperText {
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: block;
+}
