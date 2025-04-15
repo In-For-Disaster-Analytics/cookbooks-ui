@@ -52,7 +52,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
     const missingFields = requiredAppFields.filter((field) => !(field in data));
     if (missingFields.length > 0) {
       setValidationError(
-        `Missing required fields: ${missingFields.join(', ')}`,
+        `Missing required fields: ${missingFields.join(', ')}`
       );
       return false;
     }
@@ -89,7 +89,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
 
             if (!response.ok) {
               throw new Error(
-                `Failed to fetch: ${response.status} ${response.statusText}`,
+                `Failed to fetch: ${response.status} ${response.statusText}`
               );
             }
 
@@ -115,7 +115,9 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
           } catch (err) {
             setValidationState('invalid');
             setValidationError(
-              `Error fetching from URL: ${err instanceof Error ? err.message : String(err)}`,
+              `Error fetching from URL: ${
+                err instanceof Error ? err.message : String(err)
+              }`
             );
             setApp(null);
           }
@@ -126,7 +128,9 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
       } catch (err) {
         setValidationState('invalid');
         setValidationError(
-          `Unexpected error: ${err instanceof Error ? err.message : String(err)}`,
+          `Unexpected error: ${
+            err instanceof Error ? err.message : String(err)
+          }`
         );
         setApp(null);
       }
@@ -165,7 +169,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
   };
 
   const handleFileClick = (
-    e: React.MouseEvent<HTMLInputElement, MouseEvent>,
+    e: React.MouseEvent<HTMLInputElement, MouseEvent>
   ) => {
     const element = e.target as HTMLInputElement;
     element.value = '';
@@ -204,7 +208,17 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
 
               <div className={styles.optionsContainer}>
                 <div
-                  className={`${styles.optionCard} ${inputMode === 'file' ? styles.selectedOption : ''} ${validationState === 'invalid' && inputMode === 'file' ? styles.invalidOption : ''} ${validationState === 'valid' && inputMode === 'file' ? styles.validOption : ''}`}
+                  className={`${styles.optionCard} ${
+                    inputMode === 'file' ? styles.selectedOption : ''
+                  } ${
+                    validationState === 'invalid' && inputMode === 'file'
+                      ? styles.invalidOption
+                      : ''
+                  } ${
+                    validationState === 'valid' && inputMode === 'file'
+                      ? styles.validOption
+                      : ''
+                  }`}
                 >
                   <div className={styles.optionHeader}>
                     <div className={styles.optionTitle}>Upload JSON File</div>
@@ -228,7 +242,17 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                 <div className={styles.orCircle}>OR</div>
 
                 <div
-                  className={`${styles.optionCard} ${inputMode === 'url' ? styles.selectedOption : ''} ${validationState === 'invalid' && inputMode === 'url' ? styles.invalidOption : ''} ${validationState === 'valid' && inputMode === 'url' ? styles.validOption : ''}`}
+                  className={`${styles.optionCard} ${
+                    inputMode === 'url' ? styles.selectedOption : ''
+                  } ${
+                    validationState === 'invalid' && inputMode === 'url'
+                      ? styles.invalidOption
+                      : ''
+                  } ${
+                    validationState === 'valid' && inputMode === 'url'
+                      ? styles.validOption
+                      : ''
+                  }`}
                 >
                   <div className={styles.optionHeader}>
                     <div className={styles.optionTitle}>Provide JSON URL</div>
@@ -272,7 +296,9 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
 
             {/* Step 2: Customize Application ID (Optional) */}
             <div
-              className={`${styles.formSection} ${!app ? styles.disabledSection : ''}`}
+              className={`${styles.formSection} ${
+                !app ? styles.disabledSection : ''
+              }`}
             >
               <div className={styles.stepHeader}>
                 <div className={styles.stepBadge}>2</div>
