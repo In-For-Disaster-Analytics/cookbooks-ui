@@ -111,7 +111,8 @@
 
 .optionsContainer {
   display: flex;
-  flex-direction: row;
+  flex: 1;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
