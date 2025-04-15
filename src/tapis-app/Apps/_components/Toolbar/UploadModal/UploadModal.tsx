@@ -342,6 +342,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
           </Form>
         </div>
       }
+      size="lg"
+      className={styles.wideModal}
     />
   );
 };
