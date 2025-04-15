@@ -222,3 +222,27 @@
   margin-top: 0.5rem;
   display: block;
 }
+
+.optionalBadge {
+  display: inline-block;
+  margin-left: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6c757d;
+  background-color: #f1f3f5;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  vertical-align: middle;
+}
+
+.detectedId {
+  color: #495057;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.overriddenId {
+  color: #0066cc;
+  font-weight: 500;
+  display: block;
+}

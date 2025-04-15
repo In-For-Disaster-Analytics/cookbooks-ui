@@ -88,7 +88,11 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (app !== null) {
-      submit({ ...app, id: appId });
+      if (appId && appId !== app.id) {
+        submit({ ...app, id: appId });
+      } else {
+        submit(app);
+      }
     }
   };
 
@@ -161,11 +165,14 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
 
             <div className={styles.divider}></div>
 
-            {/* Step 2: Customize Application ID */}
+            {/* Step 2: Customize Application ID (Optional) */}
             <div className={styles.formSection}>
               <div className={styles.stepHeader}>
                 <div className={styles.stepBadge}>2</div>
-                <div className={styles.stepTitle}>Set Application ID</div>
+                <div className={styles.stepTitle}>
+                  Customize Application ID
+                  <span className={styles.optionalBadge}>Optional</span>
+                </div>
               </div>
 
               <div className={styles.idFormContainer}>
@@ -177,20 +184,26 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                     type="text"
                     name="appId"
                     id="appId"
-                    placeholder="Enter or overwrite the Application ID"
+                    placeholder="Override the Application ID (optional)"
                     value={appId}
                     onChange={(e) => setAppId(e.target.value)}
                     className={styles.input}
-                    required
                   />
                   <small className={styles.helperText}>
                     {appId ? (
                       <>
-                        Application ID detected or entered:{' '}
-                        <strong>{appId}</strong>. You can modify it if needed.
+                        <span className={styles.detectedId}>
+                          ID from file: <strong>{app?.id || ''}</strong>
+                        </span>
+                        {app?.id !== appId && (
+                          <span className={styles.overriddenId}>
+                            {' '}
+                            → You're overriding with: <strong>{appId}</strong>
+                          </span>
+                        )}
                       </>
                     ) : (
-                      'Enter a unique identifier for your application.'
+                      'Leave empty to use the ID from the file, or enter a new ID to override it.'
                     )}
                   </small>
                 </FormGroup>
@@ -207,7 +220,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                   className={styles.submit}
                   color="primary"
                   block
-                  disabled={isLoading || isSuccess || (!file && !url) || !appId}
+                  disabled={isLoading || isSuccess || (!file && !url)}
                 >
                   Create Application
                 </Button>
