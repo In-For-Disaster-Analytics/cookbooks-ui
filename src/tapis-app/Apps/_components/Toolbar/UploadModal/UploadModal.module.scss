@@ -246,3 +246,68 @@
   font-weight: 500;
   display: block;
 }
+
+.validOption {
+  border-color: #28a745 !important;
+  background-color: #f0fff4 !important;
+}
+
+.invalidOption {
+  border-color: #dc3545 !important;
+  background-color: #fff5f5 !important;
+}
+
+.validationError,
+.validationSuccess {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.validationError {
+  background-color: #fff5f5;
+  border: 1px solid #ffc2c2;
+  color: #dc3545;
+}
+
+.validationSuccess {
+  background-color: #f0fff4;
+  border: 1px solid #c2ffcb;
+  color: #28a745;
+}
+
+.errorIcon,
+.successIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.errorIcon {
+  background-color: #dc3545;
+  color: white;
+}
+
+.successIcon {
+  background-color: #28a745;
+  color: white;
+}
+
+.errorMessage,
+.successMessage {
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.disabledSection {
+  opacity: 0.65;
+  pointer-events: none;
+}

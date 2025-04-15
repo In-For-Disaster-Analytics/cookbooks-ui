@@ -24,6 +24,9 @@ type UploadModalProps = ToolbarModalProps & {
   maxFileSizeBytes?: number;
 };
 
+// Minimal required fields for app validation
+const requiredAppFields = ['id', 'version', 'containerImage'];
+
 const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
   const { isLoading, error, isSuccess, submit, data } = useCreate();
 
@@ -32,23 +35,100 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
   const [app, setApp] = useState<Apps.ReqPostApp | null>(null);
   const [appId, setAppId] = useState<string>('');
   const [inputMode, setInputMode] = useState<'file' | 'url' | null>(null);
+  const [validationState, setValidationState] = useState<
+    'valid' | 'invalid' | 'none'
+  >('none');
+  const [validationError, setValidationError] = useState<string>('');
+
+  // Validate the app specification
+  const validateAppSpec = (data: any): boolean => {
+    // Check if it's a valid JSON object
+    if (!data || typeof data !== 'object') {
+      setValidationError('Invalid JSON format: Not a valid object');
+      return false;
+    }
+
+    // Check for required fields
+    const missingFields = requiredAppFields.filter((field) => !(field in data));
+    if (missingFields.length > 0) {
+      setValidationError(
+        `Missing required fields: ${missingFields.join(', ')}`,
+      );
+      return false;
+    }
+
+    // Additional validation can be added here for field formats, etc.
+    return true;
+  };
 
   useEffect(() => {
     const loadAppData = async () => {
-      if (file) {
-        const contents = await file.text();
-        const data = JSON.parse(contents) as Apps.ReqPostApp;
-        setApp(data);
-        setAppId(data.id || '');
-      } else if (url) {
-        try {
-          const response = await fetch(url);
-          const data = (await response.json()) as Apps.ReqPostApp;
-          setApp(data);
-          setAppId(data.id || '');
-        } catch (err) {
-          console.error('Error fetching from URL:', err);
+      try {
+        if (file) {
+          const contents = await file.text();
+          try {
+            const data = JSON.parse(contents);
+
+            if (validateAppSpec(data)) {
+              setApp(data as Apps.ReqPostApp);
+              setAppId(data.id || '');
+              setValidationState('valid');
+              setValidationError('');
+            } else {
+              setValidationState('invalid');
+              setApp(null);
+            }
+          } catch (err) {
+            setValidationState('invalid');
+            setValidationError('Invalid JSON format: Unable to parse file');
+            setApp(null);
+          }
+        } else if (url) {
+          try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+              throw new Error(
+                `Failed to fetch: ${response.status} ${response.statusText}`,
+              );
+            }
+
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              setValidationState('invalid');
+              setValidationError('URL does not point to a JSON file');
+              setApp(null);
+              return;
+            }
+
+            const data = await response.json();
+
+            if (validateAppSpec(data)) {
+              setApp(data as Apps.ReqPostApp);
+              setAppId(data.id || '');
+              setValidationState('valid');
+              setValidationError('');
+            } else {
+              setValidationState('invalid');
+              setApp(null);
+            }
+          } catch (err) {
+            setValidationState('invalid');
+            setValidationError(
+              `Error fetching from URL: ${err instanceof Error ? err.message : String(err)}`,
+            );
+            setApp(null);
+          }
+        } else {
+          setValidationState('none');
+          setValidationError('');
         }
+      } catch (err) {
+        setValidationState('invalid');
+        setValidationError(
+          `Unexpected error: ${err instanceof Error ? err.message : String(err)}`,
+        );
+        setApp(null);
       }
     };
     loadAppData();
@@ -62,6 +142,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
     setUrl('');
     setAppId('');
     setInputMode(null);
+    setValidationState('none');
+    setValidationError('');
   }, [isSuccess]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +151,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
       setFile(e.target.files[0]);
       setUrl('');
       setInputMode('file');
+      setValidationState('none');
+      setValidationError('');
     }
   };
 
@@ -76,6 +160,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
     setUrl(e.target.value);
     setFile(null);
     setInputMode('url');
+    setValidationState('none');
+    setValidationError('');
   };
 
   const handleFileClick = (
@@ -88,6 +174,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (app !== null) {
+      // Only override the ID if the user has changed it
       if (appId && appId !== app.id) {
         submit({ ...app, id: appId });
       } else {
@@ -117,7 +204,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
 
               <div className={styles.optionsContainer}>
                 <div
-                  className={`${styles.optionCard} ${inputMode === 'file' ? styles.selectedOption : ''}`}
+                  className={`${styles.optionCard} ${inputMode === 'file' ? styles.selectedOption : ''} ${validationState === 'invalid' && inputMode === 'file' ? styles.invalidOption : ''} ${validationState === 'valid' && inputMode === 'file' ? styles.validOption : ''}`}
                 >
                   <div className={styles.optionHeader}>
                     <div className={styles.optionTitle}>Upload JSON File</div>
@@ -141,7 +228,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                 <div className={styles.orCircle}>OR</div>
 
                 <div
-                  className={`${styles.optionCard} ${inputMode === 'url' ? styles.selectedOption : ''}`}
+                  className={`${styles.optionCard} ${inputMode === 'url' ? styles.selectedOption : ''} ${validationState === 'invalid' && inputMode === 'url' ? styles.invalidOption : ''} ${validationState === 'valid' && inputMode === 'url' ? styles.validOption : ''}`}
                 >
                   <div className={styles.optionHeader}>
                     <div className={styles.optionTitle}>Provide JSON URL</div>
@@ -161,12 +248,32 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                   </small>
                 </div>
               </div>
+
+              {validationState === 'invalid' && (
+                <div className={styles.validationError}>
+                  <div className={styles.errorIcon}>!</div>
+                  <div className={styles.errorMessage}>
+                    {validationError || 'Invalid application specification'}
+                  </div>
+                </div>
+              )}
+
+              {validationState === 'valid' && (
+                <div className={styles.validationSuccess}>
+                  <div className={styles.successIcon}>✓</div>
+                  <div className={styles.successMessage}>
+                    Valid application specification detected
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className={styles.divider}></div>
 
             {/* Step 2: Customize Application ID (Optional) */}
-            <div className={styles.formSection}>
+            <div
+              className={`${styles.formSection} ${!app ? styles.disabledSection : ''}`}
+            >
               <div className={styles.stepHeader}>
                 <div className={styles.stepBadge}>2</div>
                 <div className={styles.stepTitle}>
@@ -188,14 +295,15 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                     value={appId}
                     onChange={(e) => setAppId(e.target.value)}
                     className={styles.input}
+                    disabled={!app}
                   />
                   <small className={styles.helperText}>
-                    {appId ? (
+                    {app ? (
                       <>
                         <span className={styles.detectedId}>
                           ID from file: <strong>{app?.id || ''}</strong>
                         </span>
-                        {app?.id !== appId && (
+                        {app?.id !== appId && appId && (
                           <span className={styles.overriddenId}>
                             {' '}
                             → You're overriding with: <strong>{appId}</strong>
@@ -203,7 +311,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                         )}
                       </>
                     ) : (
-                      'Leave empty to use the ID from the file, or enter a new ID to override it.'
+                      'Upload a valid application specification first'
                     )}
                   </small>
                 </FormGroup>
@@ -220,7 +328,12 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                   className={styles.submit}
                   color="primary"
                   block
-                  disabled={isLoading || isSuccess || (!file && !url)}
+                  disabled={
+                    isLoading ||
+                    isSuccess ||
+                    (!file && !url) ||
+                    validationState !== 'valid'
+                  }
                 >
                   Create Application
                 </Button>
