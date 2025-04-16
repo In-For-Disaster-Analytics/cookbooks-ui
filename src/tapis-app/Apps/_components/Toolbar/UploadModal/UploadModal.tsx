@@ -94,23 +94,26 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
             }
 
             const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
+
+            // Try to parse as JSON even if content-type isn't application/json
+            try {
+              const data = await response.json();
+
+              if (validateAppSpec(data)) {
+                setApp(data as Apps.ReqPostApp);
+                setAppId(data.id || '');
+                setValidationState('valid');
+                setValidationError('');
+              } else {
+                setValidationState('invalid');
+                setApp(null);
+              }
+            } catch (parseError) {
+              // If JSON parsing fails, then it's definitely not a valid JSON file
               setValidationState('invalid');
-              setValidationError('URL does not point to a JSON file');
+              setValidationError('URL does not contain valid JSON data');
               setApp(null);
               return;
-            }
-
-            const data = await response.json();
-
-            if (validateAppSpec(data)) {
-              setApp(data as Apps.ReqPostApp);
-              setAppId(data.id || '');
-              setValidationState('valid');
-              setValidationError('');
-            } else {
-              setValidationState('invalid');
-              setApp(null);
             }
           } catch (err) {
             setValidationState('invalid');
