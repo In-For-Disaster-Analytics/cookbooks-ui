@@ -6,6 +6,7 @@ import {
   Switch,
 } from 'react-router-dom';
 import AppCreator from '../AppsCreator';
+import AppCreate from '../AppCreate';
 import CookbookListing from '../AppListing';
 import AppDetail from '../AppDetail';
 import AppEdit from 'tapis-ui/components/apps/AppEdit';
@@ -19,6 +20,8 @@ const Router: React.FC = () => {
       </Route>
 
       <Route path={`${path}/new`} render={() => <AppCreator />}></Route>
+
+      <Route path={`${path}/create`} render={() => <AppCreate />}></Route>
 
       <Route
         path={`${path}/:appId/:appVersion`}

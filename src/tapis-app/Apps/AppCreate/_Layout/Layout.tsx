@@ -1,33 +1,23 @@
 import { Button, Form, FormGroup, Input } from 'reactstrap';
-import { GenericModal } from 'tapis-ui/_common';
 import { SubmitWrapper } from 'tapis-ui/_wrappers';
-import { ToolbarModalProps } from '../Toolbar';
-import styles from './UploadModal.module.scss';
 import { useCreate } from 'tapis-hooks/apps';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Apps } from '@tapis/tapis-typescript';
 import { focusManager } from 'react-query';
-
-export enum FileOpEventStatus {
-  loading = 'loading',
-  progress = 'progress',
-  error = 'error',
-  success = 'success',
-  none = 'none',
-}
-
-export type FileProgressState = {
-  [name: string]: number;
-};
-
-type UploadModalProps = ToolbarModalProps & {
-  maxFileSizeBytes?: number;
-};
+import {
+  PageLayout,
+  LayoutHeader,
+  LayoutBody,
+  Breadcrumbs,
+} from 'tapis-ui/_common';
+import { useHistory } from 'react-router-dom';
+import styles from './AppCreate.module.css';
 
 // Minimal required fields for app validation
 const requiredAppFields = ['id', 'version', 'containerImage'];
 
-const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
+export const Layout: React.FC = () => {
+  const history = useHistory();
   const { isLoading, error, isSuccess, submit, data } = useCreate();
 
   const [file, setFile] = useState<File | null>(null);
@@ -147,15 +137,12 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
   useEffect(() => {
     if (isSuccess) {
       focusManager.setFocused(true);
+      // Navigate to the apps list page after successful creation
+      setTimeout(() => {
+        history.push('/apps');
+      }, 1500);
     }
-    setFile(null);
-    setUrl('');
-    setAppId('');
-    setContainerImage('');
-    setInputMode(null);
-    setValidationState('none');
-    setValidationError('');
-  }, [isSuccess]);
+  }, [isSuccess, history]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -202,41 +189,33 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
   };
 
   const inputFile = useRef(null);
-  return (
-    <GenericModal
-      toggle={toggle}
-      title="Create New Application"
-      body={
-        <div className={styles.uploadModalBody}>
-          <div className={styles.summary}>
-            Create a new application by uploading a specification
-          </div>
 
+  // Create breadcrumbs for the page
+  const breadcrumbs = [
+    { text: 'Apps', to: '/apps' },
+    { text: 'Create New App', to: '/apps/create' },
+  ];
+
+  const header = (
+    <LayoutHeader>
+      <div className={styles.headerContent}>
+        <h2>Create New Application</h2>
+      </div>
+    </LayoutHeader>
+  );
+
+  const body = (
+    <LayoutBody>
+      <div className={styles.container}>
+        <div className={styles.formContainer}>
           <Form onSubmit={onSubmit}>
             {/* Step 1: Choose upload method */}
             <div className={styles.formSection}>
-              <div className={styles.stepHeader}>
-                <div className={styles.stepBadge}>1</div>
-                <div className={styles.stepTitle}>Choose Upload Method</div>
-              </div>
+              <h2 className={styles.sectionTitle}>1. Choose Upload Method</h2>
 
-              <div className={styles.optionsContainer}>
-                <div
-                  className={`${styles.optionCard} ${
-                    inputMode === 'file' ? styles.selectedOption : ''
-                  } ${
-                    validationState === 'invalid' && inputMode === 'file'
-                      ? styles.invalidOption
-                      : ''
-                  } ${
-                    validationState === 'valid' && inputMode === 'file'
-                      ? styles.validOption
-                      : ''
-                  }`}
-                >
-                  <div className={styles.optionHeader}>
-                    <div className={styles.optionTitle}>Upload JSON File</div>
-                  </div>
+              <div className={styles.uploadOptions}>
+                <div className={styles.uploadOption}>
+                  <h3>Upload JSON File</h3>
                   <Input
                     type="file"
                     name="file"
@@ -253,24 +232,10 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                   </small>
                 </div>
 
-                <div className={styles.orCircle}>OR</div>
+                <div className={styles.divider}>OR</div>
 
-                <div
-                  className={`${styles.optionCard} ${
-                    inputMode === 'url' ? styles.selectedOption : ''
-                  } ${
-                    validationState === 'invalid' && inputMode === 'url'
-                      ? styles.invalidOption
-                      : ''
-                  } ${
-                    validationState === 'valid' && inputMode === 'url'
-                      ? styles.validOption
-                      : ''
-                  }`}
-                >
-                  <div className={styles.optionHeader}>
-                    <div className={styles.optionTitle}>Provide JSON URL</div>
-                  </div>
+                <div className={styles.uploadOption}>
+                  <h3>Provide JSON URL</h3>
                   <Input
                     type="text"
                     name="url"
@@ -306,59 +271,50 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
               )}
             </div>
 
-            <div className={styles.divider}></div>
-
             {/* Step 2: Customize Application ID (Optional) */}
             <div
               className={`${styles.formSection} ${
                 !app ? styles.disabledSection : ''
               }`}
             >
-              <div className={styles.stepHeader}>
-                <div className={styles.stepBadge}>2</div>
-                <div className={styles.stepTitle}>
-                  Customize Application ID
-                  <span className={styles.optionalBadge}>Optional</span>
-                </div>
-              </div>
+              <h2 className={styles.sectionTitle}>
+                2. Customize Application ID{' '}
+                <span className={styles.optionalBadge}>(Optional)</span>
+              </h2>
 
-              <div className={styles.idFormContainer}>
-                <FormGroup>
-                  <label htmlFor="appId" className={styles.label}>
-                    Application ID
-                  </label>
-                  <Input
-                    type="text"
-                    name="appId"
-                    id="appId"
-                    placeholder="Override the Application ID (optional)"
-                    value={appId}
-                    onChange={(e) => setAppId(e.target.value)}
-                    className={styles.input}
-                    disabled={!app}
-                  />
-                  <small className={styles.helperText}>
-                    {app ? (
-                      <>
-                        <span className={styles.detectedId}>
-                          ID from file: <strong>{app?.id || ''}</strong>
+              <FormGroup>
+                <label htmlFor="appId" className={styles.label}>
+                  Application ID
+                </label>
+                <Input
+                  type="text"
+                  name="appId"
+                  id="appId"
+                  placeholder="Override the Application ID (optional)"
+                  value={appId}
+                  onChange={(e) => setAppId(e.target.value)}
+                  className={styles.input}
+                  disabled={!app}
+                />
+                <small className={styles.helperText}>
+                  {app ? (
+                    <>
+                      <span className={styles.detectedId}>
+                        ID from file: <strong>{app?.id || ''}</strong>
+                      </span>
+                      {app?.id !== appId && appId && (
+                        <span className={styles.overriddenId}>
+                          {' '}
+                          → You're overriding with: <strong>{appId}</strong>
                         </span>
-                        {app?.id !== appId && appId && (
-                          <span className={styles.overriddenId}>
-                            {' '}
-                            → You're overriding with: <strong>{appId}</strong>
-                          </span>
-                        )}
-                      </>
-                    ) : (
-                      'Upload a valid application specification first'
-                    )}
-                  </small>
-                </FormGroup>
-              </div>
+                      )}
+                    </>
+                  ) : (
+                    'Upload a valid application specification first'
+                  )}
+                </small>
+              </FormGroup>
             </div>
-
-            <div className={styles.divider}></div>
 
             {/* Step 3: Customize Container Image (Optional) */}
             <div
@@ -366,51 +322,46 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                 !app ? styles.disabledSection : ''
               }`}
             >
-              <div className={styles.stepHeader}>
-                <div className={styles.stepBadge}>3</div>
-                <div className={styles.stepTitle}>
-                  Customize Container Image
-                  <span className={styles.optionalBadge}>Optional</span>
-                </div>
-              </div>
+              <h2 className={styles.sectionTitle}>
+                3. Customize Container Image{' '}
+                <span className={styles.optionalBadge}>(Optional)</span>
+              </h2>
 
-              <div className={styles.idFormContainer}>
-                <FormGroup>
-                  <label htmlFor="containerImage" className={styles.label}>
-                    Container Image
-                  </label>
-                  <Input
-                    type="text"
-                    name="containerImage"
-                    id="containerImage"
-                    placeholder="Override the Container Image (optional)"
-                    value={containerImage}
-                    onChange={(e) => setContainerImage(e.target.value)}
-                    className={styles.input}
-                    disabled={!app}
-                  />
-                  <small className={styles.helperText}>
-                    {app ? (
-                      <>
-                        <span className={styles.detectedId}>
-                          Container image from file:{' '}
-                          <strong>{app?.containerImage || ''}</strong>
-                        </span>
-                        {app?.containerImage !== containerImage &&
-                          containerImage && (
-                            <span className={styles.overriddenId}>
-                              {' '}
-                              → You're overriding with:{' '}
-                              <strong>{containerImage}</strong>
-                            </span>
-                          )}
-                      </>
-                    ) : (
-                      'Upload a valid application specification first'
-                    )}
-                  </small>
-                </FormGroup>
-              </div>
+              <FormGroup>
+                <label htmlFor="containerImage" className={styles.label}>
+                  Container Image
+                </label>
+                <Input
+                  type="text"
+                  name="containerImage"
+                  id="containerImage"
+                  placeholder="Override the Container Image (optional)"
+                  value={containerImage}
+                  onChange={(e) => setContainerImage(e.target.value)}
+                  className={styles.input}
+                  disabled={!app}
+                />
+                <small className={styles.helperText}>
+                  {app ? (
+                    <>
+                      <span className={styles.detectedId}>
+                        Container image from file:{' '}
+                        <strong>{app?.containerImage || ''}</strong>
+                      </span>
+                      {app?.containerImage !== containerImage &&
+                        containerImage && (
+                          <span className={styles.overriddenId}>
+                            {' '}
+                            → You're overriding with:{' '}
+                            <strong>{containerImage}</strong>
+                          </span>
+                        )}
+                    </>
+                  ) : (
+                    'Upload a valid application specification first'
+                  )}
+                </small>
+              </FormGroup>
             </div>
 
             <div className={styles.submitContainer}>
@@ -422,7 +373,6 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
                 <Button
                   className={styles.submit}
                   color="primary"
-                  block
                   disabled={
                     isLoading ||
                     isSuccess ||
@@ -436,11 +386,11 @@ const UploadModal: React.FC<UploadModalProps> = ({ toggle }) => {
             </div>
           </Form>
         </div>
-      }
-      size="lg"
-      className={styles.wideModal}
-    />
+      </div>
+    </LayoutBody>
   );
+
+  return <PageLayout top={header} left={body} />;
 };
 
-export default UploadModal;
+export default Layout;

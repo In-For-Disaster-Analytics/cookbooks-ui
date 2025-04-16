@@ -3,7 +3,7 @@ import { Button } from 'reactstrap';
 import { Icon } from 'tapis-ui/_common';
 import styles from './Toolbar.module.scss';
 import DeleteModal from './DeleteModal';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useParams, useRouteMatch } from 'react-router-dom';
 import { useDownload, usePermissions } from 'tapis-hooks/files';
 import { useNotifications } from 'tapis-app/_components/Notifications';
 import { useAppsSelect } from '../AppsContext';
@@ -55,6 +55,8 @@ const Toolbar: React.FC = () => {
   const hasPermissions: boolean = selectedApps.every((app) =>
     app.owner === undefined ? false : isCurrentUser(app.owner)
   );
+  const location = useLocation();
+  const isCreatePage = location.pathname.endsWith('/create');
 
   const toggle = () => {
     setModal(undefined);
@@ -63,16 +65,18 @@ const Toolbar: React.FC = () => {
   return (
     <div id="file-operation-toolbar">
       <div className={styles['toolbar-wrapper']}>
-        <ToolbarButton
-          text="Create"
-          icon="add"
-          disabled={false}
-          onClick={() => {
-            setModal('upload');
-          }}
-          aria-label="Add"
-        />
-
+        {!isCreatePage ? (
+          <Link to="/apps/create">
+            <ToolbarButton
+              text="Create"
+              icon="add"
+              disabled={false}
+              onClick={function (): void {
+                throw new Error('Function not implemented.');
+              }}
+            />
+          </Link>
+        ) : null}
         {!appId && !appVersion ? (
           <>
             <ToolbarButton

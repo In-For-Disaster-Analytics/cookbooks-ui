@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouteMatch } from 'react-router-dom';
+import { useRouteMatch, useLocation } from 'react-router-dom';
 import { useList } from 'tapis-hooks/apps';
 import { Apps } from '@tapis/tapis-typescript';
 import { Navbar, NavItem } from 'tapis-ui/_wrappers/Navbar';
@@ -12,14 +12,23 @@ const AppsNav: React.FC = () => {
     { refetchOnWindowFocus: false }
   );
   const { url } = useRouteMatch();
+  const location = useLocation();
   const appList: Array<Apps.TapisApp> = data?.result ?? [];
+
+  // Check if we're on the create page
+  const isCreatePage = location.pathname.endsWith('/create');
 
   return (
     <QueryWrapper isLoading={isLoading} error={error}>
       <Navbar>
         <NavItem to={`${url}/new`} icon="upload">
-          New App
+          Quick Upload
         </NavItem>
+        {!isCreatePage && (
+          <NavItem to={`${url}/create`} icon="add">
+            Create App
+          </NavItem>
+        )}
         {appList.length ? (
           appList.map((app) => (
             <NavItem
