@@ -8,7 +8,7 @@ import {
 import AppCreator from '../AppsCreator';
 import CookbookListing from '../AppListing';
 import AppDetail from '../AppDetail';
-import AppEdit from 'tapis-ui/components/apps/AppNotesEdit';
+import AppEdit from 'tapis-ui/components/apps/AppEdit';
 
 const Router: React.FC = () => {
   const { path } = useRouteMatch();
