@@ -128,9 +128,14 @@ export const getIncompleteJobInputs = (
     }
   );
 
-  return incompleteRequiredJobInputs
+  const incompleteInputs = incompleteRequiredJobInputs
     .concat(incompleteOptionalJobInputs)
     .concat(incompleteUserInputs);
+
+  return {
+    incompleteInputs,
+    runtimeOptions: incompleteInputs.length > 0 ?  incompleteInputs : null
+  };
 };
 
 export const fileInputsComplete = (
